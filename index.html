@@ -55,7 +55,6 @@
             background: var(--panel-dark-bg);
             color: var(--panel-dark-text);
             overflow-x: hidden;
-            cursor: none;
             min-height: 100vh;
         }
 
@@ -103,30 +102,7 @@
             pointer-events: none;
         }
 
-        /* Custom Cursor */
-        .cursor {
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--primary);
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 9999;
-            mix-blend-mode: difference;
-            transition: transform 0.2s ease;
-        }
-
-        .cursor-follower {
-            width: 60px;
-            height: 60px;
-            border: 1px solid var(--primary);
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 9998;
-            opacity: 0.3;
-            transition: transform 0.3s ease;
-        }
+        
 
         /* Hero Section - Clean uniform ending, exactly 100vh */
         .hero {
@@ -1079,18 +1055,10 @@
                 grid-template-columns: 1fr;
             }
 
-            .cursor,
-            .cursor-follower {
-                display: none;
-            }
         }
     </style>
 </head>
 <body>
-    <!-- Custom Cursor -->
-    <div class="cursor"></div>
-    <div class="cursor-follower"></div>
-
     <!-- Hero Section -->
     <section class="hero" id="hero">
         <canvas class="hero-bg" id="heroCanvas"></canvas>
@@ -2532,8 +2500,6 @@
                     setTimeout(() => {
                         initProgrammaticScrollControl();
                     }, 300);
-                    
-                    initCustomCursor();
                     init3DTilt();
                     initParallax();
                     initContactForm();
