@@ -1,0 +1,2597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big Dreams Automation</title>
+    
+    <!-- Font Import - Rubik Dirt for headings -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik+Dirt&display=swap" rel="stylesheet">
+    
+    <!-- CDN Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- EmailJS for contact form -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00f5ff;
+            --secondary: #ff0080;
+            --accent: #ffaa00;
+            --dark: #0a0a0a;
+            --darker: #050505;
+            --light: #ffffff;
+            --gray: #888888;
+            /* Panel color system - Premium Sucker Punch style */
+            /* Off-white panel: warm paper-like tone, NOT pure white */
+            --panel-dark-bg: #0A0A0A;
+            --panel-dark-text: #F5F5F5;
+            --panel-dark-muted: #A1A1A1;
+            --panel-light-bg: #E7E5DB; /* Warm off-white, paper-like */
+            --panel-light-text: #0A0A0A;
+            --panel-light-muted: #4A4A4A;
+            --accent-gold: #C9A24D;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Body font - system fallback */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--panel-dark-bg);
+            color: var(--panel-dark-text);
+            overflow-x: hidden;
+            cursor: none;
+            min-height: 100vh;
+        }
+
+        /* Rubik Dirt font for hero/section/content headings - rough, gritty texture */
+        h1, h2, h3, h4, h5, h6,
+        .hero-headline,
+        .section-title,
+        .category-title,
+        .service-title,
+        .portfolio-item-title,
+        .review-author-info h4 {
+            font-family: 'Rubik Dirt', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            -webkit-font-smoothing: none;
+            -moz-osx-font-smoothing: unset;
+            font-smooth: never;
+        }
+
+        /* Secondary font for small supporting text only */
+        .section-subtitle,
+        .service-description,
+        .portfolio-item-desc,
+        .review-author-info p {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        html.lenis {
+            height: auto;
+        }
+
+        .lenis.lenis-smooth {
+            scroll-behavior: auto !important;
+        }
+
+        .lenis.lenis-smooth [data-lenis-prevent] {
+            overscroll-behavior: contain;
+        }
+
+        .lenis.lenis-stopped {
+            overflow: hidden;
+        }
+
+        .lenis.lenis-scrolling iframe {
+            pointer-events: none;
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transition: transform 0.2s ease;
+        }
+
+        .cursor-follower {
+            width: 60px;
+            height: 60px;
+            border: 1px solid var(--primary);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0.3;
+            transition: transform 0.3s ease;
+        }
+
+        /* Hero Section - Clean uniform ending, exactly 100vh */
+        .hero {
+            height: 100vh;
+            min-height: 100vh;
+            max-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            background: radial-gradient(circle at center, rgba(0, 245, 255, 0.1) 0%, var(--darker) 70%);
+            z-index: 10;
+        }
+
+        /* Clean hero bottom edge - no bleed-through or artifacts */
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--panel-dark-bg);
+            z-index: 11;
+        }
+
+        /* Ensure hero ends cleanly - next section won't peek in */
+        .hero + section {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.3;
+            z-index: 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 1200px;
+            padding: 0 2rem;
+        }
+
+        .hero-headline {
+            font-size: clamp(3rem, 10vw, 8rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-subheadline {
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+            color: var(--gray);
+            margin-bottom: 3rem;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+        }
+
+        .hero-cta {
+            display: inline-block;
+            padding: 1.2rem 3rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .hero-cta:hover::before {
+            left: 100%;
+        }
+
+        .hero-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 245, 255, 0.4);
+        }
+
+        .scroll-cue {
+            position: absolute;
+            bottom: 3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 2;
+        }
+
+        .scroll-cue span {
+            font-size: 0.8rem;
+            color: var(--gray);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        .scroll-cue::after {
+            content: '';
+            width: 2px;
+            height: 40px;
+            background: linear-gradient(to bottom, var(--primary), transparent);
+            animation: scrollPulse 2s infinite;
+        }
+
+        @keyframes scrollPulse {
+            0%, 100% { opacity: 0.3; transform: translateY(0); }
+            50% { opacity: 1; transform: translateY(10px); }
+        }
+
+        /* Section Height System - Screen Multipliers (100vh) */
+        /* Hero: 100vh, Services: 100vh, Reviews: 100vh, Contact: 100vh */
+        /* Portfolio: 200vh-300vh (exception) */
+        section {
+            position: relative;
+            width: 100%;
+            margin: 0 auto;
+            transition: background-color 0s ease;
+        }
+
+        /* Standard sections: exactly 100vh */
+        section.services,
+        section.reviews,
+        section.contact {
+            height: 100vh;
+            min-height: 100vh;
+            max-height: 100vh;
+            padding: 3rem 2rem;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Section Overlap System - removed for clean transitions */
+        section.panel--light {
+            margin-top: 0;
+            z-index: 1;
+        }
+
+        /* Portfolio section: auto height (no screen-size restriction) */
+        section.portfolio {
+            height: auto;
+            min-height: auto;
+            padding: 6rem 2rem 10rem;
+            overflow: visible;
+        }
+
+        /* Section content with horizontal scroll - like portfolio */
+        .section-content {
+            height: calc(100vh - 180px);
+            overflow: hidden;
+            position: relative;
+            flex: 1;
+        }
+
+        /* Horizontal scroll container for section content */
+        .section-content-track {
+            display: flex;
+            height: 100%;
+            transition: transform 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+            will-change: transform;
+        }
+
+        .section-content-track > * {
+            min-width: 100%;
+            flex-shrink: 0;
+            width: 100%;
+            height: auto;
+            max-height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 1rem;
+            padding-bottom: 1rem;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .section-content-track > *::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Allow content to flow naturally - no stretching */
+        .section-content-track .services-grid,
+        .section-content-track .reviews-container {
+            height: auto;
+            min-height: auto;
+            max-height: none;
+        }
+
+        /* Left/Right navigation arrows for sections - positioned on sides */
+        .section-nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 1px solid currentColor;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            color: currentColor;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            z-index: 20;
+            opacity: 0.8;
+            pointer-events: auto;
+        }
+
+        .section-nav-arrow[data-direction="prev"] {
+            left: 1rem;
+        }
+
+        .section-nav-arrow[data-direction="next"] {
+            right: 1rem;
+        }
+
+        /* Show arrows on hover with full opacity */
+        .section-content:hover .section-nav-arrow {
+            opacity: 1;
+        }
+
+        .section-nav-arrow:hover {
+            opacity: 1;
+            transform: translateY(-50%) scale(1.15);
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .section-nav-arrow:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        section.panel--dark .section-nav-arrow {
+            color: #E5E5E5;
+            border-color: #E5E5E5;
+        }
+
+        section.panel--light .section-nav-arrow {
+            color: #1A1A1A;
+            border-color: #1A1A1A;
+        }
+
+        /* Always visible on mobile */
+        @media (max-width: 768px) {
+            .section-nav-arrow {
+                opacity: 1;
+                width: 44px;
+                height: 44px;
+            }
+        }
+
+        section.panel--dark + section.panel--light {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Panel dividers removed - no grey overlays */
+
+        /* Panel container for content centering */
+        section.panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        section.panel > * {
+            max-width: 1400px;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Dark Panel */
+        section.panel--dark {
+            background: var(--panel-dark-bg);
+            color: var(--panel-dark-text);
+        }
+
+        /* Light Panel */
+        section.panel--light {
+            background: var(--panel-light-bg);
+            color: var(--panel-light-text);
+        }
+
+        /* Panel-specific text colors */
+        section.panel--dark .section-subtitle,
+        section.panel--dark .service-description,
+        section.panel--dark .portfolio-item-desc,
+        section.panel--dark .review-author-info p,
+        section.panel--dark .social-link {
+            color: var(--panel-dark-muted);
+        }
+
+        section.panel--light .section-subtitle,
+        section.panel--light .service-description,
+        section.panel--light .portfolio-item-desc,
+        section.panel--light .review-author-info p,
+        section.panel--light .social-link {
+            color: var(--panel-light-muted);
+        }
+
+        /* Typography - editorial, refined, muted colors */
+        .section-title {
+            font-size: clamp(2.5rem, 5vw, 5rem);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            letter-spacing: 0.02em;
+            text-align: center;
+        }
+
+        section.panel--dark .section-title {
+            color: #E5E5E5; /* Soft near-white, not pure white */
+        }
+
+        section.panel--light .section-title {
+            color: #1A1A1A; /* Soft near-black */
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            margin-bottom: 4rem;
+            font-weight: 300;
+            letter-spacing: 0.01em;
+        }
+
+        section.panel--dark .section-subtitle {
+            color: #A1A1A1; /* Muted gray */
+        }
+
+        section.panel--light .section-subtitle {
+            color: #6A6A6A; /* Warm gray */
+        }
+
+        /* Services Section - Reduced sizing to fit content */
+        /* Services Section - 2x2 grid with horizontal scrolling */
+        #servicesContent .section-content-track {
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-auto-flow: column;
+            grid-template-rows: repeat(2, 1fr);
+            grid-auto-columns: var(--column-width, calc((100% - 1.5rem) / 2));
+            gap: 1.5rem;
+            margin-top: 0;
+            height: 100%;
+            transition: transform 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+            will-change: transform;
+        }
+
+        .service-card {
+            border-radius: 15px;
+            padding: 1.3rem 1.275rem;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        section.panel--dark .service-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 245, 255, 0.1);
+        }
+
+        section.panel--light .service-card {
+            background: rgba(10, 10, 10, 0.03);
+            border: 1px solid rgba(201, 162, 77, 0.15);
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 245, 255, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .service-card:hover::before {
+            opacity: 1;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px) rotateX(5deg) rotateY(5deg);
+            border-color: var(--primary);
+            box-shadow: 0 20px 60px rgba(0, 245, 255, 0.3);
+        }
+
+        /* Service card layout: Title top, Image middle, Description bottom */
+        .service-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .service-title {
+            font-size: 1.105rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            order: 1;
+        }
+
+        .service-icon {
+            width: 100%;
+            max-width: 102px;
+            height: 102px;
+            object-fit: contain;
+            margin-bottom: 0.3rem;
+            display: block;
+            order: 2;
+        }
+
+        .service-description {
+            order: 3;
+            font-size: 0.81rem;
+            line-height: 1.5;
+            margin-top: 0.3rem;
+        }
+
+        section.panel--dark .service-title {
+            color: var(--panel-dark-text);
+        }
+
+        section.panel--light .service-title {
+            color: var(--panel-light-text);
+        }
+
+
+        /* Portfolio Section */
+        .portfolio-category {
+            margin-bottom: 6rem;
+        }
+
+        .category-title {
+            font-size: 2.5rem;
+            font-weight: 500;
+            margin-bottom: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            text-align: center; /* Center-aligned portfolio category titles */
+        }
+
+        section.panel--dark .category-title {
+            color: #C0C0C0; /* Muted gray */
+        }
+
+        section.panel--light .category-title {
+            color: #6A6A6A; /* Warm gray */
+        }
+
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .portfolio-item {
+            aspect-ratio: 4/3;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            transform-style: preserve-3d;
+        }
+
+        section.panel--dark .portfolio-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 245, 255, 0.2);
+        }
+
+        section.panel--light .portfolio-item {
+            background: rgba(10, 10, 10, 0.05);
+            border: 1px solid rgba(201, 162, 77, 0.2);
+        }
+
+        .portfolio-item:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--primary);
+            box-shadow: 0 20px 50px rgba(0, 245, 255, 0.4);
+        }
+
+        /* Clean image edges - refined and minimal */
+        .portfolio-item-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        /* Alternative: SVG-based brush edge (commented - use mask-image above for simpler) */
+        /* .portfolio-item-image::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"><path d="M0,0 Q100,50 200,0 T400,0 L400,400 Q300,350 200,400 T0,400 Z" fill="black"/></svg>') no-repeat;
+            mask-image: inherit;
+        } */
+
+        .portfolio-item:hover .portfolio-item-image {
+            transform: scale(1.1);
+        }
+
+        .portfolio-item-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 2rem;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+        }
+
+        .portfolio-item:hover .portfolio-item-overlay {
+            transform: translateY(0);
+        }
+
+        .portfolio-item-title {
+            font-size: 1.3rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.01em;
+            color: #F5F5F5;
+        }
+
+        .portfolio-item-desc {
+            font-size: 0.9rem;
+        }
+
+        /* Split Portfolio Section - 3D Models + Floor Plans */
+        .portfolio-split {
+            margin-bottom: 6rem;
+        }
+
+        .portfolio-split-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .portfolio-split-side {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .portfolio-split-slider {
+            position: relative;
+            overflow: hidden;
+            margin-top: 3rem;
+        }
+
+        .portfolio-split-track {
+            display: flex;
+            transition: transform 1.2s cubic-bezier(0.23, 1, 0.32, 1); /* Match site easing */
+            will-change: transform;
+        }
+
+        .portfolio-split-track .portfolio-item {
+            min-width: 100%;
+            flex-shrink: 0;
+        }
+
+        /* Left/Right arrow navigation - positioned on sides, vertically centered */
+        .portfolio-split-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 1px solid currentColor;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            color: currentColor;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            z-index: 10;
+            opacity: 0;
+        }
+
+        /* Left arrow */
+        .portfolio-split-nav[data-direction="prev"] {
+            left: 1rem;
+        }
+
+        /* Right arrow */
+        .portfolio-split-nav[data-direction="next"] {
+            right: 1rem;
+        }
+
+        /* Show arrows on desktop hover of slider, always visible on mobile */
+        .portfolio-split-slider:hover .portfolio-split-nav {
+            opacity: 1;
+        }
+
+        .portfolio-split-nav:hover {
+            opacity: 1;
+            transform: translateY(-50%) scale(1.1);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .portfolio-split-nav:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        section.panel--dark .portfolio-nav-btn,
+        section.panel--dark .portfolio-split-nav {
+            color: #E5E5E5;
+            border-color: #E5E5E5;
+        }
+
+        section.panel--light .portfolio-nav-btn,
+        section.panel--light .portfolio-split-nav {
+            color: #1A1A1A;
+            border-color: #1A1A1A;
+        }
+
+        /* Always visible on mobile */
+        @media (max-width: 768px) {
+            .portfolio-split-nav {
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .portfolio-split-container {
+                grid-template-columns: 1fr;
+                gap: 4rem;
+            }
+        }
+
+        /* Reviews Section - 2x2 grid layout with horizontal scrolling */
+        #reviewsContent .section-content-track {
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+        }
+
+        .reviews-container {
+            display: grid;
+            grid-auto-flow: column;
+            grid-template-rows: repeat(2, 1fr);
+            grid-auto-columns: var(--column-width, calc((100% - 1.5rem) / 2));
+            gap: 1.5rem;
+            margin-top: 0;
+            height: 100%;
+            transition: transform 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+            will-change: transform;
+        }
+
+        .review-card {
+            border-radius: 20px;
+            padding: 2.5rem;
+            position: relative;
+            transition: all 0.4s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        @media (max-width: 768px) {
+            .reviews-container {
+                grid-template-rows: 1fr;
+                grid-auto-columns: 100%;
+            }
+            
+            .review-card {
+                padding: 2rem;
+            }
+        }
+
+        section.panel--dark .review-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 245, 255, 0.1);
+        }
+
+        section.panel--light .review-card {
+            background: rgba(10, 10, 10, 0.03);
+            border: 1px solid rgba(201, 162, 77, 0.15);
+        }
+
+        .review-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 15px 40px rgba(0, 245, 255, 0.2);
+        }
+
+        .review-quote {
+            font-size: 2rem;
+            color: var(--primary);
+            opacity: 0.3;
+            position: absolute;
+            top: 1rem;
+            left: 1.5rem;
+        }
+
+        .review-text {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        section.panel--dark .review-text {
+            color: var(--panel-dark-text);
+        }
+
+        section.panel--light .review-text {
+            color: var(--panel-light-text);
+        }
+
+        .review-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .review-photo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+        }
+
+        .review-author-info h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        section.panel--dark .review-author-info h4 {
+            color: var(--panel-dark-text);
+        }
+
+        section.panel--light .review-author-info h4 {
+            color: var(--panel-light-text);
+        }
+
+        .review-author-info p {
+            font-size: 0.9rem;
+        }
+
+        /* Contact Section - Form not stretched */
+        .contact-container {
+            max-width: 800px;
+            margin: 0 auto;
+            height: auto;
+            min-height: auto;
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            height: auto;
+            min-height: auto;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 1.2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        section.panel--dark .form-input,
+        section.panel--dark .form-textarea {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 245, 255, 0.2);
+            color: var(--panel-dark-text);
+        }
+
+        section.panel--dark .form-input:focus,
+        section.panel--dark .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        section.panel--light .form-input,
+        section.panel--light .form-textarea {
+            background: rgba(10, 10, 10, 0.05);
+            border: 1px solid rgba(201, 162, 77, 0.2);
+            color: var(--panel-light-text);
+        }
+
+        section.panel--light .form-input:focus,
+        section.panel--light .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            background: rgba(10, 10, 10, 0.08);
+        }
+
+        .form-textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .form-submit {
+            padding: 1.2rem 3rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease;
+            align-self: flex-start;
+        }
+
+        .form-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 245, 255, 0.4);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .social-link {
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        section.panel--dark .social-link:hover {
+            color: var(--primary);
+        }
+
+        section.panel--light .social-link:hover {
+            color: var(--accent-gold);
+        }
+
+        .social-link:hover {
+            transform: translateY(-3px);
+        }
+
+        /* Scroll Reveal Classes */
+        .reveal {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .reveal.invisible {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        /* Responsive - reduce overlap on mobile */
+        @media (max-width: 768px) {
+            section {
+                padding: 4rem 1.5rem;
+            }
+
+            section.panel--light {
+                margin-top: 0; /* Remove overlap on mobile */
+                padding-top: 4rem;
+            }
+
+            section.panel--dark::after,
+            section.panel--light::before {
+                display: none; /* Remove dividers on mobile */
+            }
+
+            .portfolio-item:nth-child(3n+2),
+            .portfolio-item:nth-child(4n+1) {
+                transform: none; /* Remove organic offsets on mobile */
+            }
+
+            .portfolio-item:first-child,
+            .portfolio-item:last-child {
+                margin-top: 0;
+                margin-bottom: 0; /* Remove bleed on mobile */
+            }
+
+            .hero-headline {
+                font-size: 3rem;
+            }
+
+            .services-grid {
+                grid-template-rows: 1fr;
+                grid-auto-columns: 100%;
+            }
+            
+            .portfolio-grid,
+            .reviews-container {
+                grid-template-columns: 1fr;
+            }
+
+            .cursor,
+            .cursor-follower {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <canvas class="hero-bg" id="heroCanvas"></canvas>
+        <div class="hero-content">
+            <h1 class="hero-headline">Big Dreams Automation</h1>
+            <p class="hero-subheadline">Social Media Content • Websites • 3D Models • Interior / Floor Plans</p>
+            <button class="hero-cta" onclick="document.querySelector('#services').scrollIntoView({ behavior: 'smooth' })">Explore Our Work</button>
+        </div>
+        <div class="scroll-cue">
+            <span>Scroll</span>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services panel panel--light" id="services">
+        <h2 class="section-title reveal invisible">Our Services</h2>
+        <p class="section-subtitle reveal invisible">What We Do Best</p>
+        <div class="section-content" id="servicesContent">
+            <div class="section-content-track">
+                <div class="services-grid" id="servicesGrid"></div>
+            </div>
+            <button class="section-nav-arrow" data-direction="prev" data-target="servicesContent" aria-label="Previous">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 18l-6-6 6-6"/>
+                </svg>
+            </button>
+            <button class="section-nav-arrow" data-direction="next" data-target="servicesContent" aria-label="Next">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </button>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section class="portfolio panel panel--dark" id="portfolio">
+        <h2 class="section-title reveal invisible">Portfolio</h2>
+        <p class="section-subtitle reveal invisible">Our Latest Work</p>
+        <div id="portfolioContainer"></div>
+    </section>
+
+    <!-- Reviews Section -->
+    <section class="reviews panel panel--light" id="reviews">
+        <h2 class="section-title reveal invisible">Customer Reviews</h2>
+        <p class="section-subtitle reveal invisible">What Our Clients Say</p>
+        <div class="section-content" id="reviewsContent">
+            <div class="section-content-track">
+                <div class="reviews-container" id="reviewsContainer"></div>
+            </div>
+            <button class="section-nav-arrow" data-direction="prev" data-target="reviewsContent" aria-label="Previous">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 18l-6-6 6-6"/>
+                </svg>
+            </button>
+            <button class="section-nav-arrow" data-direction="next" data-target="reviewsContent" aria-label="Next">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </button>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact panel panel--dark" id="contact">
+        <h2 class="section-title reveal invisible">Get In Touch</h2>
+        <p class="section-subtitle reveal invisible">Let's Bring Your Vision to Life</p>
+        <div class="section-content" id="contactContent">
+            <div class="section-content-track">
+                <div class="contact-container">
+                    <form class="contact-form" id="contactForm">
+                        <div class="form-group">
+                            <input type="text" name="from_name" class="form-input" placeholder="Your Name" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" name="from_email" class="form-input" placeholder="Your Email" required>
+                        </div>
+                        <div class="form-group">
+                            <textarea name="message" class="form-textarea" placeholder="Your Message" required></textarea>
+                        </div>
+                        <button type="submit" class="form-submit">Send Message</button>
+                    </form>
+                    <div class="social-links">
+                        <a href="#" class="social-link">Instagram</a>
+                        <a href="#" class="social-link">LinkedIn</a>
+                        <a href="#" class="social-link">Twitter</a>
+                        <a href="#" class="social-link">Behance</a>
+                    </div>
+                </div>
+            </div>
+            <button class="section-nav-arrow" data-direction="prev" data-target="contactContent" aria-label="Previous">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 18l-6-6 6-6"/>
+                </svg>
+            </button>
+            <button class="section-nav-arrow" data-direction="next" data-target="contactContent" aria-label="Next">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </button>
+        </div>
+    </section>
+
+    <script>
+        // ============================================
+        // CENTRALIZED DATA OBJECTS
+        // ============================================
+
+        const portfolioData = {
+            instagramPosts: [
+                { id: 1, title: "Premium Product Showcase", description: "High-end product photography", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop" },
+                { id: 2, title: "Brand Identity Design", description: "Modern visual identity system", image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop" },
+                { id: 3, title: "Creative Campaign", description: "Social media marketing visuals", image: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=600&h=400&fit=crop" },
+                { id: 4, title: "Lifestyle Photography", description: "Authentic brand storytelling", image: "https://images.unsplash.com/photo-1557682250-33bd709cbe85?w=600&h=400&fit=crop" }
+            ],
+            instagramReels: [
+                { id: 1, title: "Behind the Scenes", description: "Creative process documentation", image: "https://images.unsplash.com/photo-1493612276216-ee3925520721?w=600&h=400&fit=crop" },
+                { id: 2, title: "Product Demo", description: "Interactive product showcase", image: "https://images.unsplash.com/photo-1471899236350-e301de0fe49b?w=600&h=400&fit=crop" },
+                { id: 3, title: "Trending Content", description: "Viral marketing video", image: "https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=600&h=400&fit=crop" }
+            ],
+            websites: [
+                { id: 1, title: "E-Commerce Platform", description: "Modern shopping experience", image: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=600&h=400&fit=crop" },
+                { id: 2, title: "Corporate Website", description: "Professional business presence", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop" },
+                { id: 3, title: "Portfolio Showcase", description: "Creative agency website", image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&h=400&fit=crop" },
+                { id: 4, title: "Landing Page", description: "High-converting sales page", image: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=600&h=400&fit=crop" }
+            ],
+            models3D: [
+                { id: 1, title: "Product Visualization", description: "3D product render", image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=600&h=400&fit=crop" },
+                { id: 2, title: "Architectural Model", description: "Building visualization", image: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=600&h=400&fit=crop" },
+                { id: 3, title: "Character Design", description: "3D character modeling", image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600&h=400&fit=crop" }
+            ],
+            interiors: [
+                { id: 1, title: "Modern Living Room", description: "Contemporary interior design", image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=400&fit=crop" },
+                { id: 2, title: "Luxury Kitchen", description: "High-end kitchen design", image: "https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?w=600&h=400&fit=crop" },
+                { id: 3, title: "Office Space", description: "Modern workspace design", image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&h=400&fit=crop" },
+                { id: 4, title: "Bedroom Suite", description: "Luxurious bedroom design", image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=400&fit=crop" },
+                { id: 5, title: "Floor Plan View", description: "Architectural floor plan", image: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=600&h=400&fit=crop" }
+            ]
+        };
+
+        const reviewsData = [
+            {
+                name: "Sarah Johnson",
+                role: "CEO, Tech Startup",
+                photo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop",
+                text: "Big Dreams Automation transformed our brand presence. Their creative approach and attention to detail is unmatched. Highly recommend!"
+            },
+            {
+                name: "Michael Chen",
+                role: "Founder, Design Agency",
+                photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop",
+                text: "Working with Big Dreams was a game-changer. They delivered exceptional 3D models and website design that exceeded all expectations."
+            },
+            {
+                name: "Emily Rodriguez",
+                role: "Marketing Director",
+                photo: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop",
+                text: "Their social media content consistently performs well. Professional, creative, and always on-brand. Couldn't be happier with the results!"
+            },
+            {
+                name: "David Park",
+                role: "Real Estate Developer",
+                photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop",
+                text: "The interior visualizations and floor plans they created helped us close deals faster. Incredible quality and professionalism."
+            }
+        ];
+
+        const servicesData = [
+            { title: "Instagram Posts", description: "Stunning visual content that captures attention and drives engagement on your social media platforms.", image: "post.png" },
+            { title: "Instagram Reels", description: "Viral-worthy video content that tells your story and connects with your audience.", image: "reel.png" },
+            { title: "Websites", description: "Premium web experiences that combine stunning design with seamless functionality.", image: "website.png" },
+            { title: "3D Models", description: "Photorealistic 3D renders and models that bring your products to life.", image: "3dmodel.png" },
+            { title: "Interior & Floor Plans", description: "Detailed interior visualizations and architectural floor plans for real estate and design projects.", image: "interior.png" }
+        ];
+
+        // ============================================
+        // RENDERING FUNCTIONS
+        // ============================================
+
+        /**
+         * Render Hero Section
+         */
+        function renderHero() {
+            // Hero content is already in HTML
+            // Initialize canvas background
+            initHeroCanvas();
+        }
+
+        /**
+         * Initialize Hero Canvas Background
+         */
+        function initHeroCanvas() {
+            const canvas = document.getElementById('heroCanvas');
+            if (!canvas || typeof THREE === 'undefined') return;
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+            
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            // Create particles
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 500;
+            const posArray = new Float32Array(particlesCount * 3);
+
+            for (let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 20;
+            }
+
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.01,
+                color: 0x00f5ff,
+                transparent: true,
+                opacity: 0.6
+            });
+
+            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particlesMesh);
+
+            camera.position.z = 5;
+
+            // Animation
+            function animate() {
+                requestAnimationFrame(animate);
+                particlesMesh.rotation.x += 0.001;
+                particlesMesh.rotation.y += 0.001;
+                renderer.render(scene, camera);
+            }
+
+            animate();
+
+            // Handle resize
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        /**
+         * Render Services Section
+         */
+        function renderServices() {
+            const container = document.getElementById('servicesGrid');
+            if (!container) return;
+
+            if (!container) return;
+            
+            container.innerHTML = servicesData.map(service => `
+                <div class="service-card reveal invisible">
+                    <h3 class="service-title">${service.title}</h3>
+                    <img src="${service.image}" alt="${service.title}" class="service-icon" loading="lazy">
+                    <p class="service-description">${service.description}</p>
+                </div>
+            `).join('');
+        }
+
+        /**
+         * Render Portfolio Section - Grid Layout (for Websites only)
+         * @param {string} type - Portfolio category type
+         * @param {Array} data - Portfolio items array
+         */
+        function renderPortfolioSection(type, data) {
+            if (!data || data.length === 0) return '';
+
+            const categoryTitles = {
+                instagramPosts: 'Instagram Posts',
+                instagramReels: 'Instagram Reels',
+                websites: 'Websites',
+                models3D: '3D Models',
+                interiors: 'Interiors & Floor Plans'
+            };
+
+            return `
+                <div class="portfolio-category">
+                    <h3 class="category-title reveal invisible">${categoryTitles[type] || type}</h3>
+                    <div class="portfolio-grid">
+                        ${data.map(item => `
+                            <div class="portfolio-item reveal invisible">
+                                <img src="${item.image}" alt="${item.title}" class="portfolio-item-image" loading="lazy">
+                                <div class="portfolio-item-overlay">
+                                    <h4 class="portfolio-item-title">${item.title}</h4>
+                                    <p class="portfolio-item-desc">${item.description}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * Render Single Category with Split Layout (Left/Right halves)
+         * @param {string} type - Portfolio category type
+         * @param {Array} data - Portfolio items array (split into two halves)
+         */
+        function renderSplitPortfolioSingleSection(type, data) {
+            if (!data || data.length === 0) return '';
+
+            const categoryTitles = {
+                instagramPosts: 'Instagram Posts',
+                instagramReels: 'Instagram Reels',
+                websites: 'Websites',
+                models3D: '3D Models',
+                interiors: 'Interiors & Floor Plans'
+            };
+
+            // Split items into two halves
+            const midPoint = Math.ceil(data.length / 2);
+            const leftItems = data.slice(0, midPoint);
+            const rightItems = data.slice(midPoint);
+
+            return `
+                <div class="portfolio-category portfolio-split">
+                    <h3 class="category-title reveal invisible">${categoryTitles[type] || type}</h3>
+                    <div class="portfolio-split-container">
+                        <div class="portfolio-split-side" data-side="left">
+                            <div class="portfolio-split-slider">
+                                <div class="portfolio-split-track">
+                                    ${leftItems.map(item => `
+                                        <div class="portfolio-item reveal invisible">
+                                            <img src="${item.image}" alt="${item.title}" class="portfolio-item-image" loading="lazy">
+                                            <div class="portfolio-item-overlay">
+                                                <h4 class="portfolio-item-title">${item.title}</h4>
+                                                <p class="portfolio-item-desc">${item.description}</p>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                <button class="portfolio-split-nav portfolio-nav-btn" data-direction="prev" aria-label="Previous">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M15 18l-6-6 6-6"/>
+                                    </svg>
+                                </button>
+                                <button class="portfolio-split-nav portfolio-nav-btn" data-direction="next" aria-label="Next">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 18l6-6-6-6"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="portfolio-split-side" data-side="right">
+                            <div class="portfolio-split-slider">
+                                <div class="portfolio-split-track">
+                                    ${rightItems.map(item => `
+                                        <div class="portfolio-item reveal invisible">
+                                            <img src="${item.image}" alt="${item.title}" class="portfolio-item-image" loading="lazy">
+                                            <div class="portfolio-item-overlay">
+                                                <h4 class="portfolio-item-title">${item.title}</h4>
+                                                <p class="portfolio-item-desc">${item.description}</p>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                <button class="portfolio-split-nav portfolio-nav-btn" data-direction="prev" aria-label="Previous">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M15 18l-6-6 6-6"/>
+                                    </svg>
+                                </button>
+                                <button class="portfolio-split-nav portfolio-nav-btn" data-direction="next" aria-label="Next">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 18l6-6-6-6"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * Render Split Portfolio Section (3D Models + Floor Plans)
+         * Left/Right layout with arrow navigation
+         */
+        function renderSplitPortfolioSection() {
+            const models3D = portfolioData.models3D || [];
+            const interiors = portfolioData.interiors || [];
+
+            return `
+                <div class="portfolio-category portfolio-split">
+                    <div class="portfolio-split-container">
+                        <div class="portfolio-split-side" data-side="left">
+                            <h3 class="category-title reveal invisible">3D Models</h3>
+                            <div class="portfolio-split-slider">
+                                <div class="portfolio-split-track">
+                                    ${models3D.map(item => `
+                                        <div class="portfolio-item reveal invisible">
+                                            <img src="${item.image}" alt="${item.title}" class="portfolio-item-image" loading="lazy">
+                                            <div class="portfolio-item-overlay">
+                                                <h4 class="portfolio-item-title">${item.title}</h4>
+                                                <p class="portfolio-item-desc">${item.description}</p>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                <button class="portfolio-split-nav portfolio-nav-btn" data-direction="prev" aria-label="Previous">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M15 18l-6-6 6-6"/>
+                                    </svg>
+                                </button>
+                                <button class="portfolio-split-nav portfolio-nav-btn" data-direction="next" aria-label="Next">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 18l6-6-6-6"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="portfolio-split-side" data-side="right">
+                            <h3 class="category-title reveal invisible">Interiors & Floor Plans</h3>
+                            <div class="portfolio-split-slider">
+                                <div class="portfolio-split-track">
+                                    ${interiors.map(item => `
+                                        <div class="portfolio-item reveal invisible">
+                                            <img src="${item.image}" alt="${item.title}" class="portfolio-item-image" loading="lazy">
+                                            <div class="portfolio-item-overlay">
+                                                <h4 class="portfolio-item-title">${item.title}</h4>
+                                                <p class="portfolio-item-desc">${item.description}</p>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                <button class="portfolio-split-nav portfolio-nav-btn" data-direction="prev" aria-label="Previous">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M15 18l-6-6 6-6"/>
+                                    </svg>
+                                </button>
+                                <button class="portfolio-split-nav portfolio-nav-btn" data-direction="next" aria-label="Next">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 18l6-6-6-6"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * Render All Portfolio Categories
+         * All categories use split layout except Websites (grid layout)
+         */
+        function renderAllPortfolio() {
+            const container = document.getElementById('portfolioContainer');
+            if (!container) return;
+
+            let html = '';
+            
+            // Render split sections for Instagram Posts and Instagram Reels
+            html += renderSplitPortfolioSingleSection('instagramPosts', portfolioData.instagramPosts);
+            html += renderSplitPortfolioSingleSection('instagramReels', portfolioData.instagramReels);
+            
+            // Websites section uses grid layout (exception)
+            html += renderPortfolioSection('websites', portfolioData.websites);
+            
+            // Render split section for 3D Models + Floor Plans (combined)
+            html += renderSplitPortfolioSection();
+            
+            container.innerHTML = html;
+            
+            // Initialize split navigation after rendering (deferred to allow DOM updates)
+            setTimeout(() => {
+                initSplitPortfolioNavigation();
+            }, 100);
+        }
+
+        /**
+         * Render Reviews Section
+         * @param {Array} data - Reviews data array
+         */
+        function renderReviews(data) {
+            const container = document.getElementById('reviewsContainer');
+            if (!container) return;
+
+            if (!container) return;
+            
+            container.innerHTML = data.map(review => `
+                <div class="review-card reveal invisible">
+                    <div class="review-quote">"</div>
+                    <p class="review-text">${review.text}</p>
+                    <div class="review-author">
+                        <img src="${review.photo}" alt="${review.name}" class="review-photo">
+                        <div class="review-author-info">
+                            <h4>${review.name}</h4>
+                            <p>${review.role}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ============================================
+        // ANIMATION & INTERACTION SETUP
+        // ============================================
+
+        /**
+         * Initialize Smooth Scrolling with Lenis
+         */
+        let lenisInstance = null;
+        function initSmoothScroll() {
+            if (typeof Lenis !== 'undefined') {
+                lenisInstance = new Lenis({
+                    duration: 1.2,
+                    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                    direction: 'vertical',
+                    smooth: true,
+                    smoothTouch: false,
+                    touchMultiplier: 2,
+                    infinite: false
+                });
+
+                function raf(time) {
+                    lenisInstance.raf(time);
+                    requestAnimationFrame(raf);
+                }
+
+                requestAnimationFrame(raf);
+
+                // Integrate with GSAP ScrollTrigger if available
+                if (typeof ScrollTrigger !== 'undefined') {
+                    lenisInstance.on('scroll', ScrollTrigger.update);
+                    
+                    gsap.ticker.add((time) => {
+                        lenisInstance.raf(time * 1000);
+                    });
+                    gsap.ticker.lagSmoothing(0);
+                }
+            }
+        }
+
+        /**
+         * ============================================
+         * PROGRAMMATIC SCROLL CONTROL
+         * ============================================
+         * Implements cinematic scroll snapping for sections with data-scroll-stop="true"
+         * Uses Lenis for smooth scrolling and GSAP ScrollTrigger for detection
+         */
+        function initProgrammaticScrollControl() {
+            // Disable on mobile devices
+            if (window.innerWidth < 768 || typeof Lenis === 'undefined' || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined' || !lenisInstance) {
+                return;
+            }
+
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Track snapping state to prevent loops and conflicts
+            let isSnapping = false;
+            let lastSnappedSection = null;
+            let snapTimeout = null;
+            let scrollDeltaAccumulator = 0;
+            let lastScrollTime = 0;
+
+            // Minimum scroll delta required to trigger snap (pixels)
+            const MIN_SCROLL_DELTA = 50;
+            // Snap animation duration (1.0 - 1.4 seconds for premium feel)
+            const SNAP_DURATION = 1.2;
+            // Easing function: easeOutQuart for smooth, heavy feel
+            const SNAP_EASE = 'expo.out';
+
+            // Find all sections with data-scroll-stop attribute
+            const scrollStopSections = document.querySelectorAll('[data-scroll-stop="true"]');
+
+            if (scrollStopSections.length === 0) return;
+
+            // Track scroll direction and velocity
+            let lastScrollY = window.scrollY;
+            let scrollDirection = 0; // 1 = down, -1 = up
+
+            // Update scroll direction on every scroll
+            lenisInstance.on('scroll', ({ scroll, limit, velocity, direction, progress }) => {
+                const currentScrollY = scroll;
+                
+                if (currentScrollY > lastScrollY) {
+                    scrollDirection = 1; // Scrolling down
+                } else if (currentScrollY < lastScrollY) {
+                    scrollDirection = -1; // Scrolling up
+                }
+                
+                lastScrollY = currentScrollY;
+            });
+
+            // Function to calculate snap point for a section
+            function calculateSnapPoint(section) {
+                const rect = section.getBoundingClientRect();
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.offsetHeight;
+                const scrollY = window.scrollY;
+                
+                // Get offset from data attribute (default to 0 = top of section)
+                const offsetAttribute = section.getAttribute('data-stop-offset');
+                const offset = offsetAttribute ? parseFloat(offsetAttribute) : 0;
+                
+                // Clamp offset between 0 and 1
+                const clampedOffset = Math.max(0, Math.min(1, offset));
+                
+                // Calculate snap point: section top + (section height * offset)
+                const snapPoint = sectionTop + (sectionHeight * clampedOffset);
+                
+                return {
+                    target: snapPoint,
+                    current: scrollY,
+                    section: section,
+                    offset: clampedOffset
+                };
+            }
+
+            // Function to perform the snap animation
+            function snapToSection(section) {
+                // Prevent multiple snaps to the same section
+                if (isSnapping || lastSnappedSection === section) {
+                    return;
+                }
+
+                const snapPoint = calculateSnapPoint(section);
+                const distance = Math.abs(snapPoint.target - snapPoint.current);
+                
+                // Don't snap if already very close to target (within 10px)
+                if (distance < 10) {
+                    return;
+                }
+
+                // Prevent snapping on very small scroll deltas
+                if (distance < MIN_SCROLL_DELTA && scrollDeltaAccumulator < MIN_SCROLL_DELTA) {
+                    return;
+                }
+
+                // Lock scroll during animation
+                isSnapping = true;
+                lastSnappedSection = section;
+                
+                // Prevent user scroll during animation
+                lenisInstance.stop();
+
+                // Animate scroll using GSAP tween with manual scroll updates
+                const startY = snapPoint.current;
+                const endY = snapPoint.target;
+                const startTime = performance.now();
+                const durationMs = SNAP_DURATION * 1000;
+
+                // Create a tween object to animate
+                const scrollTween = { progress: 0 };
+                
+                // Use GSAP to animate progress (0 to 1)
+                const tween = gsap.to(scrollTween, {
+                    progress: 1,
+                    duration: SNAP_DURATION,
+                    ease: SNAP_EASE,
+                    onUpdate: function() {
+                        // Calculate eased scroll position
+                        const easedProgress = scrollTween.progress;
+                        const currentY = startY + (endY - startY) * easedProgress;
+                        
+                        // Temporarily stop Lenis to prevent conflicts
+                        if (lenisInstance) {
+                            lenisInstance.stop();
+                        }
+                        
+                        // Update scroll position using window.scrollTo for precise control
+                        window.scrollTo({
+                            top: currentY,
+                            behavior: 'auto' // Use instant scroll, we handle smoothness
+                        });
+                        
+                        // Update Lenis internal state to stay in sync
+                        if (lenisInstance && lenisInstance.scroll !== undefined) {
+                            lenisInstance.scroll = currentY;
+                        }
+                        
+                        // Update ScrollTrigger to stay in sync
+                        if (typeof ScrollTrigger !== 'undefined') {
+                            ScrollTrigger.update();
+                        }
+                    },
+                    onComplete: () => {
+                        // Ensure we reach exact target
+                        window.scrollTo({
+                            top: endY,
+                            behavior: 'auto'
+                        });
+                        
+                        if (lenisInstance) {
+                            if (lenisInstance.scroll !== undefined) {
+                                lenisInstance.scroll = endY;
+                            }
+                            lenisInstance.start();
+                        }
+                        
+                        // Release scroll lock after animation
+                        isSnapping = false;
+                        
+                        // Clear delta accumulator after snap
+                        scrollDeltaAccumulator = 0;
+                        
+                        // Allow re-snapping to this section after a delay
+                        setTimeout(() => {
+                            if (lastSnappedSection === section) {
+                                lastSnappedSection = null;
+                            }
+                        }, 500);
+                    }
+                });
+            }
+
+            // Set up ScrollTrigger for each scroll-stop section
+            scrollStopSections.forEach((section) => {
+                // Create ScrollTrigger that detects when section enters viewport
+                ScrollTrigger.create({
+                    trigger: section,
+                    start: 'top 80%', // Trigger when top of section is 80% down viewport
+                    end: 'bottom 20%', // End when bottom is 20% down viewport
+                    onEnter: () => {
+                        // Only snap if scrolling down into section
+                        if (scrollDirection >= 0 && !isSnapping) {
+                            // Debounce rapid triggers
+                            clearTimeout(snapTimeout);
+                            snapTimeout = setTimeout(() => {
+                                snapToSection(section);
+                            }, 150);
+                        }
+                    },
+                    onEnterBack: () => {
+                        // Allow upward scroll past section without snapping
+                        // Only snap on downward entry
+                    },
+                    onLeave: () => {
+                        // Section has been scrolled past
+                        if (lastSnappedSection === section) {
+                            lastSnappedSection = null;
+                        }
+                    },
+                    onLeaveBack: () => {
+                        // Scrolling back up past section
+                        if (lastSnappedSection === section) {
+                            lastSnappedSection = null;
+                        }
+                    }
+                });
+            });
+
+            // Additional safety: Track scroll velocity and prevent snapping on fast scrolls
+            let lastVelocity = 0;
+            lenisInstance.on('scroll', ({ velocity }) => {
+                lastVelocity = Math.abs(velocity);
+                
+                // Reset accumulator after scroll stops
+                clearTimeout(snapTimeout);
+                snapTimeout = setTimeout(() => {
+                    scrollDeltaAccumulator = 0;
+                }, 200);
+            });
+
+            // Prevent snapping if user is actively scrolling fast (allowing scroll-through)
+            const originalRaf = lenisInstance.raf.bind(lenisInstance);
+            let fastScrollCheck = false;
+            
+            // Detect fast scrolling to allow scroll-through
+            if (lenisInstance && lastVelocity > 2) {
+                fastScrollCheck = true;
+                setTimeout(() => {
+                    fastScrollCheck = false;
+                }, 300);
+            }
+
+            // Handle window resize to recalculate snap points
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    // Refresh ScrollTriggers on resize
+                    ScrollTrigger.refresh();
+                }, 250);
+            });
+        }
+
+        /**
+         * Initialize Scroll Reveal Animations
+         */
+        function initScrollReveals() {
+            const reveals = document.querySelectorAll('.reveal');
+            
+            // Add invisible class initially
+            reveals.forEach(el => {
+                el.classList.add('invisible');
+            });
+
+            if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+                gsap.registerPlugin(ScrollTrigger);
+
+                reveals.forEach((element) => {
+                    // Remove invisible class and animate
+                    gsap.to(element, {
+                        opacity: 1,
+                        y: 0,
+                        duration: 1,
+                        ease: 'power3.out',
+                        scrollTrigger: {
+                            trigger: element,
+                            start: 'top 85%',
+                            toggleActions: 'play none none reverse',
+                            once: true
+                        },
+                        onStart: () => {
+                            element.classList.remove('invisible');
+                        }
+                    });
+                });
+            } else {
+                // Fallback: reveal all elements on load if GSAP not available
+                setTimeout(() => {
+                    reveals.forEach(el => {
+                        el.classList.remove('invisible');
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0)';
+                    });
+                }, 500);
+            }
+        }
+
+        /**
+         * Initialize Custom Cursor
+         */
+        function initCustomCursor() {
+            const cursor = document.querySelector('.cursor');
+            const cursorFollower = document.querySelector('.cursor-follower');
+            
+            if (!cursor || !cursorFollower || typeof gsap === 'undefined') return;
+
+            let mouseX = 0;
+            let mouseY = 0;
+            let followerX = 0;
+            let followerY = 0;
+
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+
+                gsap.to(cursor, {
+                    x: mouseX,
+                    y: mouseY,
+                    duration: 0.1
+                });
+            });
+
+            function animateFollower() {
+                followerX += (mouseX - followerX) * 0.1;
+                followerY += (mouseY - followerY) * 0.1;
+
+                gsap.set(cursorFollower, {
+                    x: followerX - 30,
+                    y: followerY - 30
+                });
+
+                requestAnimationFrame(animateFollower);
+            }
+
+            animateFollower();
+
+            // Cursor interactions
+            const interactiveElements = document.querySelectorAll('a, button, .portfolio-item, .service-card');
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    gsap.to(cursor, { scale: 1.5, duration: 0.3 });
+                    gsap.to(cursorFollower, { scale: 1.5, duration: 0.3 });
+                });
+                el.addEventListener('mouseleave', () => {
+                    gsap.to(cursor, { scale: 1, duration: 0.3 });
+                    gsap.to(cursorFollower, { scale: 1, duration: 0.3 });
+                });
+            });
+        }
+
+        /**
+         * Initialize 3D Tilt Effects
+         */
+        function init3DTilt() {
+            if (typeof gsap === 'undefined') return;
+            
+            const tiltElements = document.querySelectorAll('.service-card, .portfolio-item');
+
+            tiltElements.forEach(element => {
+                element.addEventListener('mousemove', (e) => {
+                    const rect = element.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+
+                    const rotateX = ((y - centerY) / centerY) * -10;
+                    const rotateY = ((x - centerX) / centerX) * 10;
+
+                    gsap.to(element, {
+                        rotateX: rotateX,
+                        rotateY: rotateY,
+                        transformPerspective: 1000,
+                        duration: 0.3,
+                        ease: 'power2.out'
+                    });
+                });
+
+                element.addEventListener('mouseleave', () => {
+                    gsap.to(element, {
+                        rotateX: 0,
+                        rotateY: 0,
+                        duration: 0.5,
+                        ease: 'power2.out'
+                    });
+                });
+            });
+        }
+
+        /**
+         * Initialize Parallax Effects
+         */
+        function initParallax() {
+            if (typeof gsap === 'undefined') return;
+            
+            const heroContent = document.querySelector('.hero-content');
+            if (!heroContent) return;
+
+            window.addEventListener('mousemove', (e) => {
+                const mouseX = (e.clientX / window.innerWidth - 0.5) * 20;
+                const mouseY = (e.clientY / window.innerHeight - 0.5) * 20;
+
+                gsap.to(heroContent, {
+                    x: mouseX,
+                    y: mouseY,
+                    duration: 1,
+                    ease: 'power2.out'
+                });
+            });
+        }
+
+        /**
+         * Initialize Split Portfolio Navigation
+         * Handles left/right arrow navigation positioned on sides of content
+         */
+        function initSplitPortfolioNavigation() {
+            const splitSliders = document.querySelectorAll('.portfolio-split-track');
+            
+            splitSliders.forEach(track => {
+                const slider = track.closest('.portfolio-split-slider');
+                const navBtns = slider.querySelectorAll('.portfolio-split-nav');
+                const items = track.querySelectorAll('.portfolio-item');
+                
+                if (items.length === 0) return;
+                
+                let currentIndex = 0;
+                const totalItems = items.length;
+                const itemWidth = 100; // Percentage
+                
+                // Update track position
+                const updatePosition = () => {
+                    const translateX = -currentIndex * itemWidth;
+                    if (typeof gsap !== 'undefined') {
+                        gsap.to(track, {
+                            x: `${translateX}%`,
+                            duration: 1.2,
+                            ease: 'expo.out' // Match site easing
+                        });
+                    } else {
+                        track.style.transform = `translateX(${translateX}%)`;
+                        track.style.transition = 'transform 1.2s cubic-bezier(0.23, 1, 0.32, 1)';
+                    }
+                    
+                    // Update button states - hide arrows at start/end
+                    navBtns.forEach(btn => {
+                        const direction = btn.getAttribute('data-direction');
+                        if (direction === 'prev') {
+                            btn.style.display = currentIndex === 0 ? 'none' : 'flex';
+                        } else {
+                            btn.style.display = currentIndex >= totalItems - 1 ? 'none' : 'flex';
+                        }
+                    });
+                };
+                
+                // Navigation handlers
+                navBtns.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        const direction = btn.getAttribute('data-direction');
+                        
+                        if (direction === 'prev' && currentIndex > 0) {
+                            currentIndex--;
+                            updatePosition();
+                        } else if (direction === 'next' && currentIndex < totalItems - 1) {
+                            currentIndex++;
+                            updatePosition();
+                        }
+                    });
+                });
+                
+                // Initialize
+                updatePosition();
+            });
+        }
+
+        /**
+         * Initialize Internal Section Navigation - Horizontal scrolling like portfolio
+         * Handles left/right arrow navigation for section content
+         */
+        function initInternalSectionNavigation() {
+            const sectionContents = document.querySelectorAll('.section-content');
+            
+            sectionContents.forEach(content => {
+                const track = content.querySelector('.section-content-track');
+                if (!track) return;
+                
+                const navArrows = content.querySelectorAll('.section-nav-arrow');
+                
+                // Special handling for reviews section - 2x2 grid with horizontal scrolling
+                if (content.id === 'reviewsContent') {
+                    const reviewsContainer = track.querySelector('.reviews-container');
+                    if (!reviewsContainer) return;
+                    
+                    const reviewCards = reviewsContainer.querySelectorAll('.review-card');
+                    if (reviewCards.length === 0) return;
+                    
+                    let currentIndex = 0;
+                    const totalCards = reviewCards.length;
+                    const cardsPerPage = 4; // 2x2 grid = 4 cards per page
+                    const totalPages = Math.ceil(totalCards / cardsPerPage);
+                    
+                    // Set container width to fit all pages (100% per page)
+                    // Calculate column width: 2 columns per page, each column = (trackWidth - gap) / 2
+                    const updateContainerWidth = () => {
+                        if (track.offsetWidth > 0) {
+                            const trackWidth = track.offsetWidth;
+                            const gap = 24; // 1.5rem = 24px (approximate)
+                            const columnWidth = (trackWidth - gap) / 2;
+                            const containerWidth = trackWidth * totalPages;
+                            
+                            reviewsContainer.style.width = `${containerWidth}px`;
+                            reviewsContainer.style.setProperty('--column-width', `${columnWidth}px`);
+                            reviewsContainer.setAttribute('data-total-pages', totalPages);
+                        }
+                    };
+                    
+                    // Update reviews container position - scroll by page (4 cards at a time)
+                    const updatePosition = () => {
+                        const maxIndex = Math.max(0, totalPages - 1);
+                        
+                        if (currentIndex > maxIndex) {
+                            currentIndex = maxIndex;
+                        }
+                        
+                        // Calculate scroll distance - scroll by track width (one full page)
+                        if (track.offsetWidth > 0) {
+                            const scrollDistance = track.offsetWidth;
+                            const translateX = -currentIndex * scrollDistance;
+                            
+                            if (typeof gsap !== 'undefined') {
+                                gsap.to(reviewsContainer, {
+                                    x: translateX,
+                                    duration: 1.2,
+                                    ease: 'expo.out' // Match site easing
+                                });
+                            } else {
+                                reviewsContainer.style.transform = `translateX(${translateX}px)`;
+                                reviewsContainer.style.transition = 'transform 1.2s cubic-bezier(0.23, 1, 0.32, 1)';
+                            }
+                        }
+                        
+                        // Update arrow visibility
+                        navArrows.forEach(btn => {
+                            const direction = btn.getAttribute('data-direction');
+                            if (totalCards <= cardsPerPage) {
+                                btn.style.display = 'none';
+                            } else if (direction === 'prev') {
+                                btn.style.display = currentIndex === 0 ? 'none' : 'flex';
+                            } else {
+                                btn.style.display = currentIndex >= maxIndex ? 'none' : 'flex';
+                            }
+                        });
+                    };
+                    
+                    // Navigation handlers
+                    navArrows.forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            const direction = btn.getAttribute('data-direction');
+                            const maxIndex = Math.max(0, totalPages - 1);
+                            
+                            if (direction === 'prev' && currentIndex > 0) {
+                                currentIndex--;
+                                updatePosition();
+                            } else if (direction === 'next' && currentIndex < maxIndex) {
+                                currentIndex++;
+                                updatePosition();
+                            }
+                        });
+                    });
+                    
+                    // Handle window resize
+                    let resizeTimeout;
+                    window.addEventListener('resize', () => {
+                        clearTimeout(resizeTimeout);
+                        resizeTimeout = setTimeout(() => {
+                            currentIndex = 0; // Reset to first position on resize
+                            updateContainerWidth();
+                            updatePosition();
+                        }, 250);
+                    });
+                    
+                    // Initialize
+                    updateContainerWidth();
+                    updatePosition();
+                    return;
+                }
+                
+                // Special handling for services section - 2x2 grid with horizontal scrolling
+                if (content.id === 'servicesContent') {
+                    const servicesGrid = track.querySelector('.services-grid');
+                    if (!servicesGrid) return;
+                    
+                    const serviceCards = servicesGrid.querySelectorAll('.service-card');
+                    if (serviceCards.length === 0) return;
+                    
+                    let currentIndex = 0;
+                    const totalCards = serviceCards.length;
+                    const cardsPerPage = 4; // 2x2 grid = 4 cards per page
+                    const totalPages = Math.ceil(totalCards / cardsPerPage);
+                    
+                    // Set container width to fit all pages (100% per page)
+                    // Calculate column width: 2 columns per page, each column = (trackWidth - gap) / 2
+                    const updateContainerWidth = () => {
+                        if (track.offsetWidth > 0) {
+                            const trackWidth = track.offsetWidth;
+                            const gap = 24; // 1.5rem = 24px (approximate)
+                            const columnWidth = (trackWidth - gap) / 2;
+                            const containerWidth = trackWidth * totalPages;
+                            
+                            servicesGrid.style.width = `${containerWidth}px`;
+                            servicesGrid.style.setProperty('--column-width', `${columnWidth}px`);
+                            servicesGrid.setAttribute('data-total-pages', totalPages);
+                        }
+                    };
+                    
+                    // Update services grid position - scroll by page (4 cards at a time)
+                    const updatePosition = () => {
+                        const maxIndex = Math.max(0, totalPages - 1);
+                        
+                        if (currentIndex > maxIndex) {
+                            currentIndex = maxIndex;
+                        }
+                        
+                        // Calculate scroll distance - scroll by track width (one full page)
+                        if (track.offsetWidth > 0) {
+                            const scrollDistance = track.offsetWidth;
+                            const translateX = -currentIndex * scrollDistance;
+                            
+                            if (typeof gsap !== 'undefined') {
+                                gsap.to(servicesGrid, {
+                                    x: translateX,
+                                    duration: 1.2,
+                                    ease: 'expo.out' // Match site easing
+                                });
+                            } else {
+                                servicesGrid.style.transform = `translateX(${translateX}px)`;
+                                servicesGrid.style.transition = 'transform 1.2s cubic-bezier(0.23, 1, 0.32, 1)';
+                            }
+                        }
+                        
+                        // Update arrow visibility
+                        navArrows.forEach(btn => {
+                            const direction = btn.getAttribute('data-direction');
+                            if (totalCards <= cardsPerPage) {
+                                btn.style.display = 'none';
+                            } else if (direction === 'prev') {
+                                btn.style.display = currentIndex === 0 ? 'none' : 'flex';
+                            } else {
+                                btn.style.display = currentIndex >= maxIndex ? 'none' : 'flex';
+                            }
+                        });
+                    };
+                    
+                    // Navigation handlers
+                    navArrows.forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            const direction = btn.getAttribute('data-direction');
+                            const maxIndex = Math.max(0, totalPages - 1);
+                            
+                            if (direction === 'prev' && currentIndex > 0) {
+                                currentIndex--;
+                                updatePosition();
+                            } else if (direction === 'next' && currentIndex < maxIndex) {
+                                currentIndex++;
+                                updatePosition();
+                            }
+                        });
+                    });
+                    
+                    // Handle window resize
+                    let resizeTimeout;
+                    window.addEventListener('resize', () => {
+                        clearTimeout(resizeTimeout);
+                        resizeTimeout = setTimeout(() => {
+                            currentIndex = 0; // Reset to first position on resize
+                            updateContainerWidth();
+                            updatePosition();
+                        }, 250);
+                    });
+                    
+                    // Initialize
+                    updateContainerWidth();
+                    updatePosition();
+                    return;
+                }
+                
+                // Default handling for other sections (contact)
+                const items = track.children;
+                
+                if (items.length === 0) return;
+                
+                let currentIndex = 0;
+                const totalItems = items.length;
+                const itemWidth = 100; // Percentage
+                
+                // Update track position - horizontal sliding
+                const updatePosition = () => {
+                    const translateX = -currentIndex * itemWidth;
+                    if (typeof gsap !== 'undefined') {
+                        gsap.to(track, {
+                            x: `${translateX}%`,
+                            duration: 1.2,
+                            ease: 'expo.out' // Match site easing
+                        });
+                    } else {
+                        track.style.transform = `translateX(${translateX}%)`;
+                        track.style.transition = 'transform 1.2s cubic-bezier(0.23, 1, 0.32, 1)';
+                    }
+                    
+                    // Update arrow visibility - hide at start/end, but keep visible if only one item
+                    navArrows.forEach(btn => {
+                        const direction = btn.getAttribute('data-direction');
+                        if (totalItems <= 1) {
+                            // Hide arrows if only one page of content
+                            btn.style.display = 'none';
+                        } else if (direction === 'prev') {
+                            btn.style.display = currentIndex === 0 ? 'none' : 'flex';
+                        } else {
+                            btn.style.display = currentIndex >= totalItems - 1 ? 'none' : 'flex';
+                        }
+                    });
+                };
+                
+                // Navigation handlers
+                navArrows.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        const direction = btn.getAttribute('data-direction');
+                        
+                        if (direction === 'prev' && currentIndex > 0) {
+                            currentIndex--;
+                            updatePosition();
+                        } else if (direction === 'next' && currentIndex < totalItems - 1) {
+                            currentIndex++;
+                            updatePosition();
+                        }
+                    });
+                });
+                
+                // Initialize
+                updatePosition();
+            });
+        }
+
+        /**
+         * Initialize Contact Form with EmailJS
+         * 
+         * SETUP INSTRUCTIONS:
+         * 1. Go to https://www.emailjs.com/ and create a free account
+         * 2. Create an Email Service (Gmail, Outlook, etc.) and note the Service ID
+         * 3. Create an Email Template with variables: {{from_name}}, {{from_email}}, {{message}}
+         *    and note the Template ID
+         * 4. Get your Public Key from Account > General > API Keys
+         * 5. Replace the placeholders below:
+         *    - YOUR_PUBLIC_KEY: Your EmailJS public key
+         *    - YOUR_SERVICE_ID: Your email service ID (e.g., service_xxxxx)
+         *    - YOUR_TEMPLATE_ID: Your email template ID (e.g., template_xxxxx)
+         */
+        function initContactForm() {
+            const form = document.getElementById('contactForm');
+            if (!form) return;
+
+            // EmailJS Configuration - REPLACE THESE WITH YOUR ACTUAL VALUES
+            const EMAILJS_CONFIG = {
+                PUBLIC_KEY: '_4yOwAcm8RIGh_jdY',      // Get from: https://dashboard.emailjs.com/admin/integration
+                SERVICE_ID: 'service_iuu8ptb',      // Get from: https://dashboard.emailjs.com/admin
+                TEMPLATE_ID: 'template_78jfo2h'     // Get from: https://dashboard.emailjs.com/admin
+            };
+
+            // Initialize EmailJS if configured
+            const isEmailJSConfigured = EMAILJS_CONFIG.PUBLIC_KEY !== 'YOUR_PUBLIC_KEY' && 
+                                       EMAILJS_CONFIG.SERVICE_ID !== 'YOUR_SERVICE_ID' && 
+                                       EMAILJS_CONFIG.TEMPLATE_ID !== 'YOUR_TEMPLATE_ID';
+            
+            if (typeof emailjs !== 'undefined' && isEmailJSConfigured) {
+                emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
+            }
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const submitBtn = form.querySelector('.form-submit');
+                const originalText = submitBtn.textContent;
+                
+                // Disable button and show loading state
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Sending...';
+                
+                try {
+                    // If EmailJS is not configured, show demo success message
+                    if (typeof emailjs === 'undefined' || !isEmailJSConfigured) {
+                        // Demo mode - just show success message
+                        submitBtn.textContent = 'Sent! (Demo Mode)';
+                        submitBtn.style.background = 'linear-gradient(135deg, #00ff00, #00cc00)';
+                        
+                        console.warn('EmailJS not configured. Please set up your Public Key, Service ID, and Template ID in initContactForm() function.');
+                        
+                        setTimeout(() => {
+                            submitBtn.textContent = originalText;
+                            submitBtn.style.background = '';
+                            submitBtn.disabled = false;
+                            form.reset();
+                        }, 2000);
+                        return;
+                    }
+                    
+                    // Send email using EmailJS
+                    const response = await emailjs.sendForm(
+                        EMAILJS_CONFIG.SERVICE_ID,
+                        EMAILJS_CONFIG.TEMPLATE_ID,
+                        form
+                    );
+                    
+                    // Success feedback
+                    if (typeof gsap !== 'undefined') {
+                        gsap.to(submitBtn, {
+                            scale: 0.95,
+                            duration: 0.1,
+                            yoyo: true,
+                            repeat: 1
+                        });
+                    }
+                    
+                    submitBtn.textContent = 'Sent!';
+                    submitBtn.style.background = 'linear-gradient(135deg, #00ff00, #00cc00)';
+                    
+                    // Reset form after 2 seconds
+                    setTimeout(() => {
+                        submitBtn.textContent = originalText;
+                        submitBtn.style.background = '';
+                        submitBtn.disabled = false;
+                        form.reset();
+                    }, 2000);
+                    
+                } catch (error) {
+                    // Error handling
+                    console.error('EmailJS Error:', error);
+                    
+                    submitBtn.textContent = 'Error - Try Again';
+                    submitBtn.style.background = 'linear-gradient(135deg, #ff4444, #cc0000)';
+                    
+                    setTimeout(() => {
+                        submitBtn.textContent = originalText;
+                        submitBtn.style.background = '';
+                        submitBtn.disabled = false;
+                    }, 3000);
+                }
+            });
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+
+        /**
+         * ============================================
+         * PANEL ALTERNATION SYSTEM
+         * ============================================
+         * Automatically assigns dark/light panel classes
+         * based on section index for alternating layout
+         */
+        function initPanelAlternation() {
+            // Get all main content sections (exclude hero)
+            const sections = document.querySelectorAll('section:not(.hero)');
+            
+            sections.forEach((section, index) => {
+                // Add panel class
+                section.classList.add('panel');
+                
+                // Alternate: even index = dark, odd index = light
+                if (index % 2 === 0) {
+                    section.classList.add('panel--dark');
+                } else {
+                    section.classList.add('panel--light');
+                }
+            });
+        }
+
+        /**
+         * Initialize all components when DOM is ready
+         */
+        function init() {
+            // Render all sections first
+            renderHero();
+            renderServices();
+            renderAllPortfolio();
+            renderReviews(reviewsData);
+
+            // Initialize panel alternation (if not already set in HTML)
+            // initPanelAlternation(); // Commented out - using HTML classes instead
+
+            // Wait a bit for rendering to complete, then initialize animations
+            setTimeout(() => {
+                // Initialize scroll reveals first
+                initScrollReveals();
+                
+                // Initialize smooth scroll
+                initSmoothScroll();
+                
+                // Wait for GSAP to load
+                if (typeof gsap !== 'undefined') {
+                    // Initialize programmatic scroll control (must be after Lenis is ready)
+                    setTimeout(() => {
+                        initProgrammaticScrollControl();
+                    }, 300);
+                    
+                    initCustomCursor();
+                    init3DTilt();
+                    initParallax();
+                    initContactForm();
+                    initInternalSectionNavigation();
+
+                    // Hero entrance animation
+                    const heroHeadline = document.querySelector('.hero-headline');
+                    const heroSubheadline = document.querySelector('.hero-subheadline');
+                    const heroCta = document.querySelector('.hero-cta');
+
+                    if (heroHeadline) {
+                        gsap.from(heroHeadline, {
+                            opacity: 0,
+                            y: 50,
+                            duration: 1.5,
+                            ease: 'power3.out',
+                            delay: 0.3
+                        });
+                    }
+
+                    if (heroSubheadline) {
+                        gsap.from(heroSubheadline, {
+                            opacity: 0,
+                            y: 30,
+                            duration: 1.2,
+                            ease: 'power3.out',
+                            delay: 0.6
+                        });
+                    }
+
+                    if (heroCta) {
+                        gsap.from(heroCta, {
+                            opacity: 0,
+                            scale: 0.8,
+                            duration: 1,
+                            ease: 'back.out(1.7)',
+                            delay: 0.9
+                        });
+                    }
+                } else {
+                    // Fallback animations without GSAP
+                    const heroElements = document.querySelectorAll('.hero-headline, .hero-subheadline, .hero-cta');
+                    heroElements.forEach((el, index) => {
+                        setTimeout(() => {
+                            el.style.opacity = '1';
+                            el.style.transform = 'translateY(0)';
+                        }, 300 + (index * 300));
+                    });
+                }
+            }, 100);
+        }
+
+        // Run initialization when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
